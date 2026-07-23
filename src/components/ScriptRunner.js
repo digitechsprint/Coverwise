@@ -60,5 +60,5 @@ export default function ScriptRunner({ html, bodyClass }) {
     });
   }, [pathname, html, bodyClass]);
 
-  return <div ref={containerRef} className={bodyClass} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: html }} />;
+  return <div id="coverwise-content-root" ref={containerRef} className={bodyClass} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: html }} />;
 }
