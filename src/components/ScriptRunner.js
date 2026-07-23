@@ -29,9 +29,30 @@ export default function ScriptRunner({ html, bodyClass }) {
       // Don't re-run scripts that are already running or broken
       if (oldScript.hasAttribute('data-executed')) return;
       
+      const scriptContent = oldScript.innerHTML;
+      window.__executedScripts = window.__executedScripts || new Set();
+      
+      if (scriptContent) {
+        if (window.__executedScripts.has(scriptContent)) return;
+        window.__executedScripts.add(scriptContent);
+      } else if (oldScript.src) {
+        if (window.__executedScripts.has(oldScript.src)) return;
+        window.__executedScripts.add(oldScript.src);
+      }
+      
       const newScript = document.createElement('script');
       Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-      newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+      
+      if (oldScript.innerHTML) {
+        const type = oldScript.getAttribute('type');
+        const isJS = !type || type === 'text/javascript' || type === 'application/javascript' || type === 'module';
+        
+        if (isJS) {
+          newScript.appendChild(document.createTextNode(`{\n${oldScript.innerHTML}\n}`));
+        } else {
+          newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+        }
+      }
       newScript.setAttribute('data-executed', 'true');
       
       // Replace old script with new one so it executes
