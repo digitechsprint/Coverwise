@@ -1,9 +1,16 @@
 import Link from 'next/link';
 import { getAllPages } from '@/lib/db';
+import { supabase } from '@/lib/supabase';
+
+export const revalidate = 0;
 
 export default async function AdminDashboard() {
   const pages = await getAllPages();
   const totalPages = pages.length;
+  
+  const { count: totalBlogs } = await supabase
+    .from('blogs')
+    .select('*', { count: 'exact', head: true });
 
   return (
     <div className="space-y-6">
@@ -33,7 +40,7 @@ export default async function AdminDashboard() {
           </div>
           <div>
             <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Blog Posts</p>
-            <p className="text-3xl font-bold text-gray-900">0</p>
+            <p className="text-3xl font-bold text-gray-900">{totalBlogs || 0}</p>
           </div>
         </div>
 
@@ -56,21 +63,24 @@ export default async function AdminDashboard() {
           <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
         </div>
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Link href="/admin/pages" className="group flex items-center p-5 border border-gray-200 rounded-xl hover:border-blue-500 hover:shadow-md hover:bg-blue-50/30 transition-all">
+          <Link href="/admin/blogs" className="group flex items-center p-5 border border-gray-200 rounded-xl hover:border-indigo-500 hover:shadow-md hover:bg-indigo-50/30 transition-all">
             <div className="flex-1">
-              <h4 className="text-base font-semibold text-gray-900 group-hover:text-blue-700">Edit Pages</h4>
-              <p className="text-sm text-gray-500 mt-1">Visually edit Home, About, Services, etc.</p>
+              <h4 className="text-base font-semibold text-gray-900 group-hover:text-indigo-700">Manage Blogs</h4>
+              <p className="text-sm text-gray-500 mt-1">Create, edit, and delete dynamic blog posts.</p>
             </div>
-            <svg className="w-6 h-6 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-6 h-6 text-gray-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </Link>
 
-          <Link href="/admin/blogs" className="group flex items-center p-5 border border-gray-200 rounded-xl hover:border-indigo-500 hover:shadow-md hover:bg-indigo-50/30 transition-all opacity-50 cursor-not-allowed">
+          <Link href="/admin/leads" className="group flex items-center p-5 border border-gray-200 rounded-xl hover:border-green-500 hover:shadow-md hover:bg-green-50/30 transition-all">
             <div className="flex-1">
-              <h4 className="text-base font-semibold text-gray-900 group-hover:text-indigo-700">Manage Blogs</h4>
-              <p className="text-sm text-gray-500 mt-1">Coming soon with Supabase integration.</p>
+              <h4 className="text-base font-semibold text-gray-900 group-hover:text-green-700">View Leads</h4>
+              <p className="text-sm text-gray-500 mt-1">Check form submissions and inquiries.</p>
             </div>
+            <svg className="w-6 h-6 text-gray-400 group-hover:text-green-600 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </Link>
         </div>
       </div>

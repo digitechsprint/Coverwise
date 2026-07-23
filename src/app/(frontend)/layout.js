@@ -1,6 +1,7 @@
 import "../globals.css";
 import ContactFormHandler from '@/components/ContactFormHandler';
 
+export const revalidate = 0;
 export const metadata = {
   title: "COVERWISE IMF - Insurance Company in Ghaziabad, Noida",
   description: "COVERWISE IMF – is best Insurance Company in Ghaziabad & Noida. Offering expert insurance & personal finance consulting with top policies in India.",

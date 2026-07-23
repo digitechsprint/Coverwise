@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import '../globals.css'; // Inherit Tailwind
-
+import LogoutButton from '@/components/LogoutButton';
+import '../../globals.css'; // Inherit Tailwind
 export const metadata = {
   title: 'CoverWise Admin Dashboard',
   description: 'Manage your website content visually',
@@ -25,12 +25,6 @@ export default function AdminLayout({ children }) {
                 </svg>
                 Dashboard
               </Link>
-              <Link href="/admin/pages" className="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
-                <svg className="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Pages
-              </Link>
               <Link href="/admin/leads" className="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
                 <svg className="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
@@ -51,6 +45,7 @@ export default function AdminLayout({ children }) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </Link>
+              <LogoutButton />
             </div>
           </aside>
 
