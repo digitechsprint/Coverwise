@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import ScriptRunner from '@/components/ScriptRunner';
 
-export const revalidate = 0;
+export const revalidate = 3600; // invalidated immediately on save via revalidatePath
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;

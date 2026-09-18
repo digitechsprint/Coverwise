@@ -4,14 +4,15 @@ const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error("Missing Supabase credentials in .env.local");
+if (!supabaseUrl || !serviceRoleKey) {
+  console.error("Missing Supabase credentials in .env.local (need NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY)");
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Uses the service role key because the `pages` table only grants public SELECT via RLS.
+const supabase = createClient(supabaseUrl, serviceRoleKey);
 
 async function run() {
   console.log("Reading data/pages.json...");

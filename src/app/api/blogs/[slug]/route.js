@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { isAdminAuthenticated } from '@/lib/auth';
 
 export async function GET(request, { params }) {
   const { slug } = await params;
@@ -23,8 +26,12 @@ export async function GET(request, { params }) {
 }
 
 export async function PUT(request, { params }) {
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { slug: originalSlug } = await params;
-  
+
   try {
     const data = await request.json();
     const { title, slug, excerpt, featured_image, content_html } = data;
@@ -38,7 +45,7 @@ export async function PUT(request, { params }) {
       updated_at: new Date().toISOString()
     };
     
-    const { data: updatedBlog, error } = await supabase
+    const { data: updatedBlog, error } = await supabaseAdmin
       .from('blogs')
       .update(updateData)
       .eq('slug', originalSlug)
@@ -46,7 +53,12 @@ export async function PUT(request, { params }) {
       .single();
       
     if (error) throw error;
-    
+
+    revalidatePath('/blog');
+    revalidatePath(`/blog/${originalSlug}`);
+    if (updatedBlog.slug !== originalSlug) {
+      revalidatePath(`/blog/${updatedBlog.slug}`);
+    }
     return NextResponse.json({ success: true, blog: updatedBlog });
   } catch (error) {
     console.error('Error updating blog:', error);
@@ -55,16 +67,22 @@ export async function PUT(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { slug } = await params;
-  
+
   try {
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('blogs')
       .delete()
       .eq('slug', slug);
       
     if (error) throw error;
-    
+
+    revalidatePath('/blog');
+    revalidatePath(`/blog/${slug}`);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting blog:', error);

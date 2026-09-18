@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { supabaseAdmin } from './supabaseAdmin';
 
 /**
  * Get a page by its slug from Supabase
@@ -54,7 +55,7 @@ export async function getAllPages() {
  */
 export async function updatePageHtml(slug, html) {
   try {
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('pages')
       .update({ html: html, updated_at: new Date().toISOString() })
       .eq('slug', slug);

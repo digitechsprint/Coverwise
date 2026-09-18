@@ -1,10 +1,10 @@
 export const revalidate = 0; // Disable caching so new leads show immediately
 
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 export default async function AdminLeadsList() {
-  // Fetch leads from Supabase
-  const { data: leads, error } = await supabase
+  // Fetch leads from Supabase (service role: contact_submissions has no public SELECT policy)
+  const { data: leads, error } = await supabaseAdmin
     .from('contact_submissions')
     .select('*')
     .order('created_at', { ascending: false });

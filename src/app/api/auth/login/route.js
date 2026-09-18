@@ -4,8 +4,8 @@ export async function POST(request) {
   try {
     const { id, password } = await request.json();
     
-    // Check credentials as requested
-    if (id === 'Admin' && password === 'Coverwise@123') {
+    // Check credentials against environment-configured admin account
+    if (id === process.env.ADMIN_ID && password === process.env.ADMIN_PASSWORD) {
       const response = NextResponse.json({ success: true });
       
       // Set HTTP-only secure cookie

@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { isAdminAuthenticated } from '@/lib/auth';
 
 export async function GET() {
   try {
@@ -18,6 +21,10 @@ export async function GET() {
 }
 
 export async function POST(request) {
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const data = await request.json();
     const { title, excerpt, featured_image, content_html } = data;
@@ -25,7 +32,7 @@ export async function POST(request) {
     // Auto-generate slug from title
     let slug = data.slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     
-    const { data: newBlog, error } = await supabase
+    const { data: newBlog, error } = await supabaseAdmin
       .from('blogs')
       .insert([
         { slug, title, excerpt, featured_image, content_html }
@@ -39,7 +46,9 @@ export async function POST(request) {
       }
       throw error;
     }
-    
+
+    revalidatePath('/blog');
+    revalidatePath(`/blog/${newBlog.slug}`);
     return NextResponse.json({ success: true, blog: newBlog });
   } catch (error) {
     console.error('Error creating blog:', error);
