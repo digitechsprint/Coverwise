@@ -31,13 +31,13 @@ export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
+        <div className="flex items-center justify-between h-20 gap-4">
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <Image
               src="/wp-content/uploads/2023/01/Coverwise-Logo_200x200px.png"
               alt="Coverwise IMF LLP"
-              width={40}
-              height={40}
+              width={52}
+              height={52}
               className="rounded-full"
             />
             <span className="sh-wordmark text-sm font-bold text-blue-900 leading-none">
@@ -60,7 +60,7 @@ export default function SiteHeader() {
             >
               <button
                 type="button"
-                className="flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-blue-700 transition-colors"
+                className="sh-btn-reset sh-services-trigger-desktop flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-blue-700 transition-colors"
                 onClick={() => setServicesOpen((o) => !o)}
               >
                 Our Services
@@ -110,7 +110,7 @@ export default function SiteHeader() {
 
           <button
             type="button"
-            className="sh-toggle-mobile p-2 text-gray-700"
+            className="sh-btn-reset sh-toggle-mobile p-2 text-gray-700"
             aria-label="Toggle menu"
             onClick={() => setMobileOpen((o) => !o)}
           >
@@ -128,7 +128,7 @@ export default function SiteHeader() {
       </div>
 
       {mobileOpen && (
-        <div className="sh-mobile-panel border-t border-gray-100 bg-white px-4 py-4 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
+        <div className="sh-mobile-panel border-t border-gray-100 bg-white px-4 py-4 space-y-1 max-h-[calc(100vh-5rem)] overflow-y-auto">
           {NAV_LINKS.slice(0, 2).map((link) => (
             <Link
               key={link.href}
@@ -143,7 +143,7 @@ export default function SiteHeader() {
           <div>
             <button
               type="button"
-              className="w-full flex items-center justify-between px-2 py-2.5 text-sm font-medium text-gray-700"
+              className="sh-btn-reset sh-services-trigger-mobile w-full px-2 py-2.5 text-sm font-medium text-gray-700"
               onClick={() => setMobileServicesOpen((o) => !o)}
             >
               Our Services

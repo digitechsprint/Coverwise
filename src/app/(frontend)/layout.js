@@ -48,6 +48,42 @@ export default function RootLayout({ children }) {
           .sh-toggle-mobile { display: none !important; }
           .sh-mobile-panel { display: none !important; }
         }
+
+        /* The legacy theme has a broad rule (button, .btn, .btn-theme, ...)
+           that paints a solid accent-color background onto every bare
+           <button>. It's unlayered CSS, so it beats Tailwind's own button
+           reset regardless of specificity. <SiteHeader> only uses <button>
+           for the "Our Services" trigger and the mobile hamburger toggle -
+           reset those explicitly so they render as plain controls instead
+           of picking up the legacy button skin. */
+        .sh-btn-reset {
+          background: transparent !important;
+          border: none !important;
+          box-shadow: none !important;
+          border-radius: 0 !important;
+          color: #374151 !important;
+          font-size: 0.875rem !important;
+        }
+        .sh-btn-reset:hover {
+          color: #1d4ed8 !important;
+        }
+        /* Tailwind's "flex"/"items-center" utilities are layered too, so they
+           lose to the legacy button reset the same way display/color did
+           above. Force the internal text+chevron layout directly - scoped to
+           just the two triggers that need it, so it can't fight the
+           .sh-toggle-mobile responsive display rules above. */
+        .sh-services-trigger-desktop,
+        .sh-services-trigger-mobile {
+          display: flex !important;
+          align-items: center !important;
+        }
+        .sh-services-trigger-desktop {
+          padding: 0 !important;
+          gap: 0.25rem !important;
+        }
+        .sh-services-trigger-mobile {
+          justify-content: space-between !important;
+        }
       `}</style>
       <body suppressHydrationWarning className="home page-template page-template-elementor_header_footer page page-id-7 wp-custom-logo ehf-template-modins ehf-stylesheet-modins elementor-default elementor-template-full-width elementor-kit-15 elementor-page elementor-page-7">
         <ContactFormHandler />
