@@ -49,7 +49,10 @@ export default function ScriptRunner({ html, bodyClass }) {
         const isJS = !type || type === 'text/javascript' || type === 'application/javascript' || type === 'module';
         
         if (isJS) {
-          newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+          // Wrap in a block to prevent 'has already been declared' errors for let/const
+          // when inline scripts are executed multiple times (e.g. strict mode or route changes).
+          // var declarations will still escape the block as expected by many WP plugins.
+          newScript.appendChild(document.createTextNode(`{\n${oldScript.innerHTML}\n}`));
         } else {
           newScript.appendChild(document.createTextNode(oldScript.innerHTML));
         }
