@@ -9467,6 +9467,8 @@ body.elementor-editor-active[data-elementor-device-mode*="tablet"] .elementor-hi
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  position: relative;
+  z-index: 2;
 }
 
 .testimonial-three__meta-left {
