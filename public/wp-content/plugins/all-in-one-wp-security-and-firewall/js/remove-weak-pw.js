@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		var nodes_length = nodes.length;
 		
 		for (var j = 0; j < nodes_length; j++) {
-			if (nodes[j].parentNode) {
-				nodes[j].parentNode.removeChild(nodes[j]);
+			if (nodes[j]) {
+				nodes[j].style.display = 'none';
 			}
 		}
 	}

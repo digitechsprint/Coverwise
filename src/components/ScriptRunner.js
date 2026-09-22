@@ -42,13 +42,14 @@ export default function ScriptRunner({ html, bodyClass }) {
       
       const newScript = document.createElement('script');
       Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+      newScript.async = false;
       
       if (oldScript.innerHTML) {
         const type = oldScript.getAttribute('type');
         const isJS = !type || type === 'text/javascript' || type === 'application/javascript' || type === 'module';
         
         if (isJS) {
-          newScript.appendChild(document.createTextNode(`{\n${oldScript.innerHTML}\n}`));
+          newScript.appendChild(document.createTextNode(oldScript.innerHTML));
         } else {
           newScript.appendChild(document.createTextNode(oldScript.innerHTML));
         }
@@ -58,7 +59,64 @@ export default function ScriptRunner({ html, bodyClass }) {
       // Replace old script with new one so it executes
       oldScript.parentNode.replaceChild(newScript, oldScript);
     });
+
+    // Dispatch load events to trigger plugins like Revolution Slider
+    // that wait for these events, which have already passed during React hydration.
+    setTimeout(() => {
+      window.dispatchEvent(new Event('DOMContentLoaded'));
+      document.dispatchEvent(new Event('DOMContentLoaded'));
+      window.dispatchEvent(new Event('load'));
+      if (window.SR7 && window.SR7.F && window.SR7.F.init) {
+        window.SR7.F.init();
+      }
+    }, 100);
   }, [pathname, html, bodyClass]);
+
+  useEffect(() => {
+    // Force redirect for 'Get a Quote Today' buttons, overriding any slider or theme defaults
+    const handleQuoteClick = (e) => {
+      const target = e.target;
+      if (
+        (target.tagName === 'A' && target.innerText && target.innerText.trim() === 'Get a Quote Today') ||
+        (target.closest && target.closest('a') && target.closest('a').innerText && target.closest('a').innerText.trim() === 'Get a Quote Today') ||
+        (target.tagName === 'A' && target.href && target.href.includes('get-a-quote'))
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.location.href = '/get-a-quote#quote-form';
+      } else if (
+        (target.tagName === 'A' && target.innerText && target.innerText.trim().toLowerCase() === 'talk to an advisor') ||
+        (target.closest && target.closest('a') && target.closest('a').innerText && target.closest('a').innerText.trim().toLowerCase() === 'talk to an advisor')
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.location.href = 'tel:+919958806806';
+      } else if (
+        (target.tagName === 'A' && target.innerText && target.innerText.trim().toLowerCase() === 'contact us') ||
+        (target.closest && target.closest('a') && target.closest('a').innerText && target.closest('a').innerText.trim().toLowerCase() === 'contact us')
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.location.href = '/contact';
+      }
+    };
+    
+    document.addEventListener('click', handleQuoteClick, true);
+
+    // Auto-scroll to form if hash is present
+    if (window.location.hash === '#quote-form') {
+      setTimeout(() => {
+        const formElement = document.querySelector('.gva-element-gva-tab-contact-form');
+        if (formElement) {
+          formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 800);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleQuoteClick, true);
+    };
+  }, []);
 
   return <div id="coverwise-content-root" ref={containerRef} className={bodyClass} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: html }} />;
 }
