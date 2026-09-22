@@ -34,11 +34,10 @@ export default function SiteHeader() {
         <div className="flex items-center justify-between h-20 gap-4">
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <Image
-              src="/wp-content/uploads/2023/01/Coverwise-Logo_200x200px.png"
+              src="/logo-icon.png"
               alt="Coverwise IMF LLP"
-              width={52}
-              height={52}
-              className="rounded-full"
+              width={49}
+              height={44}
             />
             <span className="sh-wordmark text-sm font-bold text-blue-900 leading-none">
               Coverwise IMF LLP
