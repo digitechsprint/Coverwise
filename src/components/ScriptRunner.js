@@ -101,6 +101,27 @@ export default function ScriptRunner({ html, bodyClass }) {
         e.preventDefault();
         e.stopPropagation();
         window.location.href = '/contact';
+      } else if (
+        (target.tagName === 'A' && target.innerText && target.innerText.trim().toLowerCase() === 'locate an agent') ||
+        (target.closest && target.closest('a') && target.closest('a').innerText && target.closest('a').innerText.trim().toLowerCase() === 'locate an agent')
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.open('https://wa.me/919958806806', '_blank', 'noopener,noreferrer');
+      } else if (
+        (target.tagName === 'A' && target.innerText && target.innerText.trim().toLowerCase() === 'connect with gaurav') ||
+        (target.closest && target.closest('a') && target.closest('a').innerText && target.closest('a').innerText.trim().toLowerCase() === 'connect with gaurav')
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.open('https://wa.me/919958806806', '_blank', 'noopener,noreferrer');
+      } else if (
+        (target.tagName === 'A' && target.innerText && target.innerText.trim().toLowerCase() === 'get started') ||
+        (target.closest && target.closest('a') && target.closest('a').innerText && target.closest('a').innerText.trim().toLowerCase() === 'get started')
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.location.href = '/get-a-quote#quote-form';
       }
     };
     
