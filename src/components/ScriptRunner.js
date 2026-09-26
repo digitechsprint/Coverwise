@@ -76,56 +76,86 @@ export default function ScriptRunner({ html, bodyClass }) {
   }, [pathname, html, bodyClass]);
 
   useEffect(() => {
-    // Force redirect for 'Get a Quote Today' buttons, overriding any slider or theme defaults
+    // These CTA buttons come from the imported WordPress markup with href="#"
+    // (dead links, or leftover slider/theme defaults). Route them by their
+    // visible text since that's the only stable thing about them.
+    const WHATSAPP_URL = 'https://wa.me/919958806806';
+    const QUOTE_FORM_URL = '/get-a-quote#quote-form';
+    const BUTTON_ACTIONS = {
+      'get a quote today': () => { window.location.href = QUOTE_FORM_URL; },
+      'get started': () => { window.location.href = QUOTE_FORM_URL; },
+      'get a free quote': () => { window.location.href = QUOTE_FORM_URL; },
+      'talk to an advisor': () => { window.open(WHATSAPP_URL, '_blank', 'noopener,noreferrer'); },
+      'locate an agent': () => { window.open(WHATSAPP_URL, '_blank', 'noopener,noreferrer'); },
+      'connect with gaurav': () => { window.open(WHATSAPP_URL, '_blank', 'noopener,noreferrer'); },
+      'contact us': () => { window.location.href = '/contact'; },
+    };
+
     const handleQuoteClick = (e) => {
       const target = e.target;
-      if (
-        (target.tagName === 'A' && target.innerText && target.innerText.trim() === 'Get a Quote Today') ||
-        (target.closest && target.closest('a') && target.closest('a').innerText && target.closest('a').innerText.trim() === 'Get a Quote Today') ||
-        (target.tagName === 'A' && target.href && target.href.includes('get-a-quote'))
-      ) {
+      const link = target.tagName === 'A' ? target : target.closest && target.closest('a');
+      if (!link) return;
+
+      if (link.href && link.href.includes('get-a-quote')) {
         e.preventDefault();
         e.stopPropagation();
-        window.location.href = '/get-a-quote#quote-form';
-      } else if (
-        (target.tagName === 'A' && target.innerText && target.innerText.trim().toLowerCase() === 'talk to an advisor') ||
-        (target.closest && target.closest('a') && target.closest('a').innerText && target.closest('a').innerText.trim().toLowerCase() === 'talk to an advisor')
-      ) {
+        window.location.href = QUOTE_FORM_URL;
+        return;
+      }
+
+      const text = link.innerText && link.innerText.trim().toLowerCase();
+      const action = text && BUTTON_ACTIONS[text];
+      if (action) {
         e.preventDefault();
         e.stopPropagation();
-        window.location.href = 'tel:+919958806806';
-      } else if (
-        (target.tagName === 'A' && target.innerText && target.innerText.trim().toLowerCase() === 'contact us') ||
-        (target.closest && target.closest('a') && target.closest('a').innerText && target.closest('a').innerText.trim().toLowerCase() === 'contact us')
-      ) {
-        e.preventDefault();
-        e.stopPropagation();
-        window.location.href = '/contact';
-      } else if (
-        (target.tagName === 'A' && target.innerText && target.innerText.trim().toLowerCase() === 'locate an agent') ||
-        (target.closest && target.closest('a') && target.closest('a').innerText && target.closest('a').innerText.trim().toLowerCase() === 'locate an agent')
-      ) {
-        e.preventDefault();
-        e.stopPropagation();
-        window.open('https://wa.me/919958806806', '_blank', 'noopener,noreferrer');
-      } else if (
-        (target.tagName === 'A' && target.innerText && target.innerText.trim().toLowerCase() === 'connect with gaurav') ||
-        (target.closest && target.closest('a') && target.closest('a').innerText && target.closest('a').innerText.trim().toLowerCase() === 'connect with gaurav')
-      ) {
-        e.preventDefault();
-        e.stopPropagation();
-        window.open('https://wa.me/919958806806', '_blank', 'noopener,noreferrer');
-      } else if (
-        (target.tagName === 'A' && target.innerText && target.innerText.trim().toLowerCase() === 'get started') ||
-        (target.closest && target.closest('a') && target.closest('a').innerText && target.closest('a').innerText.trim().toLowerCase() === 'get started')
-      ) {
-        e.preventDefault();
-        e.stopPropagation();
-        window.location.href = '/get-a-quote#quote-form';
+        action();
       }
     };
-    
+
     document.addEventListener('click', handleQuoteClick, true);
+
+    // Elementor's own accordion widget JS doesn't initialize in this port, so
+    // .elementor-tab-content stays hidden (display:none from the base CSS)
+    // no matter what's clicked. Toggle it manually, matching the classic
+    // accordion behavior: opening one item closes the others.
+    const handleAccordionClick = (e) => {
+      const title = e.target.closest && e.target.closest('.elementor-tab-title');
+      if (!title) return;
+      const accordion = title.closest('.elementor-accordion');
+      if (!accordion) return;
+      e.preventDefault();
+
+      const getContent = (t) => {
+        const id = t.getAttribute('aria-controls');
+        return id ? document.getElementById(id) : t.nextElementSibling;
+      };
+
+      const isOpen = title.classList.contains('elementor-active');
+
+      // A plugin stylesheet has `[hidden] { display: none !important; }`, which
+      // beats the widget's own (non-!important) `display: none`. So opening a
+      // panel means clearing the `hidden` attribute *and* setting an inline
+      // display, not just one or the other.
+      const setOpen = (el, open) => {
+        el.hidden = !open;
+        el.style.display = open ? 'block' : 'none';
+      };
+
+      accordion.querySelectorAll('.elementor-tab-title.elementor-active').forEach((openTitle) => {
+        if (openTitle === title) return;
+        openTitle.classList.remove('elementor-active');
+        openTitle.setAttribute('aria-expanded', 'false');
+        const openContent = getContent(openTitle);
+        if (openContent) setOpen(openContent, false);
+      });
+
+      title.classList.toggle('elementor-active', !isOpen);
+      title.setAttribute('aria-expanded', String(!isOpen));
+      const content = getContent(title);
+      if (content) setOpen(content, !isOpen);
+    };
+
+    document.addEventListener('click', handleAccordionClick);
 
     // Auto-scroll to form if hash is present
     if (window.location.hash === '#quote-form') {
@@ -139,6 +169,7 @@ export default function ScriptRunner({ html, bodyClass }) {
 
     return () => {
       document.removeEventListener('click', handleQuoteClick, true);
+      document.removeEventListener('click', handleAccordionClick);
     };
   }, []);
 
