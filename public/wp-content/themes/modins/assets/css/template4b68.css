@@ -8184,19 +8184,10 @@ body.elementor-editor-active[data-elementor-device-mode*="tablet"] .elementor-hi
   width: 18px;
   height: 26px;
   background: url("../images/arrow.png") no-repeat center center transparent;
-  display: inline-block;
+  display: none;
   position: absolute;
   top: 12px;
   left: calc(100% + 12px);
-}
-
-@media (max-width: 767.98px) {
-  /* This decorative arrow is meant to point at content beside the heading
-     in the desktop grid; on stacked mobile layouts there's nothing next
-     to it, so it just floats off the edge of the heading. */
-  .gsc-heading.style-3 .content-inner .title > span:after {
-    display: none;
-  }
 }
 
 .gsc-heading.style-4 .sub-title {
