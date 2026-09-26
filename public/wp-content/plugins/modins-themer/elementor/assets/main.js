@@ -226,7 +226,7 @@
 		         progress.circleProgress({
 		         	startAngle: -Math.PI / 2
 		         }).on('circle-animation-progress', function(event, progress, stepValue) {
-					   $(this).find('strong').html(Math.round(stepValue.toFixed(2).substr(1) * 100) + '<i>%</i>');
+					   $(this).find('strong').html(Math.round(stepValue * 100) + '<i>%</i>');
 					});
 		      });
 		   });

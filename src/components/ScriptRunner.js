@@ -145,7 +145,29 @@ export default function ScriptRunner({ html, bodyClass }) {
       });
     }, 2500);
 
-    return () => clearTimeout(swiperFallback);
+    // Same root cause, different widget: the circle-progress stat widget
+    // (Affordable Cost / Quality of Work on the About page) is also wired
+    // up through an "element_ready" hook (GaviasElements.elementCircleProgress
+    // -> jQuery .circleProgress(), see main8a54.js) that never re-fires on
+    // client-side navigation, so it never draws its ring or fills in its
+    // percentage text on any page you didn't land on directly.
+    const circleProgressFallback = setTimeout(() => {
+      const $ = window.jQuery;
+      if (!$ || !$.fn.circleProgress) return;
+      document.querySelectorAll('.circle-progress').forEach((el) => {
+        if (el.querySelector('canvas, svg')) return; // already initialized
+        $(el)
+          .circleProgress({ startAngle: -Math.PI / 2 })
+          .on('circle-animation-progress', function (event, progress, stepValue) {
+            $(this).find('strong').html(Math.round(stepValue * 100) + '<i>%</i>');
+          });
+      });
+    }, 2500);
+
+    return () => {
+      clearTimeout(swiperFallback);
+      clearTimeout(circleProgressFallback);
+    };
   }, [pathname, html, bodyClass]);
 
   useEffect(() => {
