@@ -124,6 +124,12 @@ export default function ScriptRunner({ html, bodyClass }) {
       const accordion = title.closest('.elementor-accordion');
       if (!accordion) return;
       e.preventDefault();
+      // A leftover Elementor script partially initializes and fights this
+      // handler for the same click, immediately re-closing what we just
+      // opened. Run in the capture phase and stop the event outright so
+      // nothing downstream (including that script's own listener) sees it.
+      e.stopPropagation();
+      e.stopImmediatePropagation();
 
       const getContent = (t) => {
         const id = t.getAttribute('aria-controls');
@@ -155,7 +161,7 @@ export default function ScriptRunner({ html, bodyClass }) {
       if (content) setOpen(content, !isOpen);
     };
 
-    document.addEventListener('click', handleAccordionClick);
+    document.addEventListener('click', handleAccordionClick, true);
 
     // Auto-scroll to form if hash is present
     if (window.location.hash === '#quote-form') {
@@ -169,7 +175,7 @@ export default function ScriptRunner({ html, bodyClass }) {
 
     return () => {
       document.removeEventListener('click', handleQuoteClick, true);
-      document.removeEventListener('click', handleAccordionClick);
+      document.removeEventListener('click', handleAccordionClick, true);
     };
   }, []);
 
