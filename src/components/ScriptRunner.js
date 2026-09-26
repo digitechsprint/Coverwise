@@ -86,6 +86,24 @@ export default function ScriptRunner({ html, bodyClass }) {
         el.style.display = 'none';
       });
     }, 100);
+
+    // Every carousel widget shows a preloader GIF (a ::after covering the
+    // whole widget) and keeps its slides at opacity:0 until Swiper's JS
+    // adds a "swiper-initialized" class to it. That works for most
+    // carousels on the site, but some (e.g. the gallery widget) never get
+    // that class -- Swiper itself either never runs for them or throws
+    // before finishing -- so the preloader and blank slides are stuck
+    // forever. Give Swiper a couple of seconds to do it properly, then
+    // force the same "initialized" state ourselves for any that didn't.
+    const swiperFallback = setTimeout(() => {
+      document.querySelectorAll('.init-carousel-swiper, .init-carousel-swiper-theme, .testimonial-carousel-thumbnail').forEach((el) => {
+        if (!el.classList.contains('swiper-initialized') && !el.classList.contains('swiper-container-initialized')) {
+          el.classList.add('swiper-initialized');
+        }
+      });
+    }, 2500);
+
+    return () => clearTimeout(swiperFallback);
   }, [pathname, html, bodyClass]);
 
   useEffect(() => {
