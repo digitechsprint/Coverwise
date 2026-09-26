@@ -89,17 +89,59 @@ export default function ScriptRunner({ html, bodyClass }) {
 
     // Every carousel widget shows a preloader GIF (a ::after covering the
     // whole widget) and keeps its slides at opacity:0 until Swiper's JS
-    // adds a "swiper-initialized" class to it. That works for most
-    // carousels on the site, but some (e.g. the gallery widget) never get
-    // that class -- Swiper itself either never runs for them or throws
-    // before finishing -- so the preloader and blank slides are stuck
-    // forever. Give Swiper a couple of seconds to do it properly, then
-    // force the same "initialized" state ourselves for any that didn't.
+    // adds a "swiper-initialized" class to it. On a real page load that
+    // class comes from Elementor's own frontend framework, which scans the
+    // DOM once at boot and fires an "element_ready" hook per widget (e.g.
+    // GaviasElements.elementGallery -> initCarousel -> `new Swiper(...)`,
+    // see main8a54.js). That scan never repeats for content swapped in by
+    // client-side navigation, so any carousel on a page you didn't land on
+    // directly never gets a real Swiper instance -- just a permanently
+    // stuck preloader and invisible slides. Give Elementor's own init a
+    // couple of seconds in case it does eventually run, then construct
+    // Swiper ourselves for anything it missed, using the same config shape
+    // (breakpoints keyed by the widget's own data-carousel JSON) as
+    // GaviasElements.initCarousel.
     const swiperFallback = setTimeout(() => {
-      document.querySelectorAll('.init-carousel-swiper, .init-carousel-swiper-theme, .testimonial-carousel-thumbnail').forEach((el) => {
-        if (!el.classList.contains('swiper-initialized') && !el.classList.contains('swiper-container-initialized')) {
-          el.classList.add('swiper-initialized');
+      if (typeof window.Swiper === 'undefined') return;
+      document.querySelectorAll('.init-carousel-swiper, .init-carousel-swiper-theme').forEach((el) => {
+        // Real Swiper instances add "swiper-horizontal"; our own fallback
+        // (or Elementor's real init) both also add "swiper-initialized".
+        if (el.classList.contains('swiper-horizontal')) return;
+
+        let settings = {};
+        try {
+          settings = JSON.parse(el.dataset.carousel || '{}');
+        } catch (e) {
+          // ignore malformed config, fall back to defaults below
         }
+        const items = (key, fallback) => (settings[key] != null ? settings[key] : fallback);
+        const wrapper = el.closest('.swiper-slider-wrapper');
+
+        new window.Swiper(el, {
+          loop: !!items('loop', true),
+          spaceBetween: items('space_between', 30),
+          speed: items('speed', 600),
+          effect: items('effect', 'slide'),
+          grabCursor: true,
+          autoplay: items('autoplay', true)
+            ? { delay: items('autoplay_delay', 6000), disableOnInteraction: false, pauseOnMouseEnter: !!items('autoplay_hover', false) }
+            : false,
+          breakpoints: {
+            0: { slidesPerView: 1 },
+            560: { slidesPerView: items('items_xx', 1) },
+            640: { slidesPerView: items('items_xs', 1) },
+            768: { slidesPerView: items('items_sm', 2) },
+            1024: { slidesPerView: items('items_md', 2) },
+            1200: { slidesPerView: items('items_lg', 3) },
+            1400: { slidesPerView: items('items', 3) },
+          },
+          navigation: items('navigation', true) && wrapper
+            ? { nextEl: wrapper.querySelector('.swiper-nav-next'), prevEl: wrapper.querySelector('.swiper-nav-prev'), hiddenClass: 'hidden' }
+            : false,
+          pagination: items('pagination', false) && wrapper
+            ? { el: wrapper.querySelector('.swiper-pagination'), type: items('pagination_type', 'bullets'), clickable: true }
+            : false,
+        });
       });
     }, 2500);
 
