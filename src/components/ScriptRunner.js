@@ -72,6 +72,19 @@ export default function ScriptRunner({ html, bodyClass }) {
       if (window.SR7 && window.SR7.F && window.SR7.F.init) {
         window.SR7.F.init();
       }
+
+      // The theme's own script only ever dismisses this once: it's tied to
+      // a <script src> tag whose URL gets de-duped across every subsequent
+      // page's copy of the same tag, so it never fires again after the
+      // first page load. Each new page's fresh loading overlay is then
+      // stuck forever on client-side navigation. Dismiss it ourselves --
+      // on both document.body (set above) and this container div, which
+      // also carries the same bodyClass string as its className.
+      document.body.classList.remove('modins-body-loading');
+      if (container) container.classList.remove('modins-body-loading');
+      document.querySelectorAll('.modins-page-loading').forEach((el) => {
+        el.style.display = 'none';
+      });
     }, 100);
   }, [pathname, html, bodyClass]);
 
