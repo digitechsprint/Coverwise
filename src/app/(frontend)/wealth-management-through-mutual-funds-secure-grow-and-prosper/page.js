@@ -8,9 +8,13 @@ export async function generateMetadata() {
   return {
     title: page.title,
     description: page.description,
+    alternates: {
+      canonical: 'https://coverwiseimf.com/wealth-management-through-mutual-funds-secure-grow-and-prosper',
+    },
     openGraph: {
       title: page.title,
       description: page.description,
+      url: 'https://coverwiseimf.com/wealth-management-through-mutual-funds-secure-grow-and-prosper',
     }
   };
 }

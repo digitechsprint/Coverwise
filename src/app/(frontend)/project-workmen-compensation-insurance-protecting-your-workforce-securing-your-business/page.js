@@ -8,9 +8,13 @@ export async function generateMetadata() {
   return {
     title: page.title,
     description: page.description,
+    alternates: {
+      canonical: 'https://coverwiseimf.com/project-workmen-compensation-insurance-protecting-your-workforce-securing-your-business',
+    },
     openGraph: {
       title: page.title,
       description: page.description,
+      url: 'https://coverwiseimf.com/project-workmen-compensation-insurance-protecting-your-workforce-securing-your-business',
     }
   };
 }

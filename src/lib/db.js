@@ -77,7 +77,8 @@ export async function getAllPages() {
         return Object.values(db.pages).map(p => ({
           slug: p.slug,
           title: p.title,
-          description: p.description
+          description: p.description,
+          updated_at: p.updated_at
         }));
       }
       return [];
@@ -85,7 +86,7 @@ export async function getAllPages() {
 
     const { data, error } = await supabase
       .from('pages')
-      .select('slug, title, description')
+      .select('slug, title, description, updated_at')
       .order('slug');
       
     if (error || !data) return [];

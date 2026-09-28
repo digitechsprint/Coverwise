@@ -8,6 +8,9 @@ export async function generateMetadata() {
   return {
     title: 'Blog - CoverWise IMF',
     description: 'Read the latest insights and news on insurance and personal finance from CoverWise.',
+    alternates: {
+      canonical: 'https://coverwiseimf.com/blog',
+    },
   };
 }
 

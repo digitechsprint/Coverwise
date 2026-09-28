@@ -18,9 +18,13 @@ export async function generateMetadata({ params }) {
   return {
     title: `${blog.title} - CoverWise Blog`,
     description: blog.excerpt,
+    alternates: {
+      canonical: `https://coverwiseimf.com/blog/${slug}`,
+    },
     openGraph: {
       title: blog.title,
       description: blog.excerpt,
+      url: `https://coverwiseimf.com/blog/${slug}`,
       images: blog.featured_image ? [blog.featured_image] : [],
     }
   };
