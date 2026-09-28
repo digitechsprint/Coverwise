@@ -164,9 +164,38 @@ export default function ScriptRunner({ html, bodyClass }) {
       });
     }, 2500);
 
+    // The home page hero (Revolution Slider / "SR7") draws its background
+    // photo into a <canvas> via its own WebGL/2D rendering pipeline, which
+    // works correctly on desktop but has a real bug on narrow viewports:
+    // it draws the image at something like its natural size/position
+    // instead of covering the slide, leaving a tiny sliver of the photo in
+    // one corner. This isn't a "script never ran" issue like the others
+    // above -- the canvas does render, just wrong -- so there's no hook to
+    // nudge. Below the mobile breakpoint, swap it for a plain CSS
+    // background-image (using the same photo already sitting in the
+    // <noscript> fallback) instead of fighting the canvas engine.
+    const sr7MobileBgFallback = setTimeout(() => {
+      if (window.innerWidth >= 768) return;
+      document.querySelectorAll('sr7-bg').forEach((el) => {
+        const canvas = el.querySelector('canvas');
+        const noscript = el.querySelector('noscript');
+        if (!canvas || !noscript) return;
+        // Browsers parse <noscript> content as raw text (not real child
+        // DOM) whenever scripting is enabled, so the <img> inside it has
+        // to be read out of that text rather than queried as an element.
+        const match = noscript.textContent.match(/src="([^"]+)"/);
+        if (!match) return;
+        canvas.style.display = 'none';
+        el.style.backgroundImage = `url("${match[1]}")`;
+        el.style.backgroundSize = 'cover';
+        el.style.backgroundPosition = 'center';
+      });
+    }, 2500);
+
     return () => {
       clearTimeout(swiperFallback);
       clearTimeout(circleProgressFallback);
+      clearTimeout(sr7MobileBgFallback);
     };
   }, [pathname, html, bodyClass]);
 
